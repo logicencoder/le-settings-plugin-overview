@@ -14,10 +14,10 @@ WordPress plugin that powers **site-wide configuration** on logicencoder.com: se
 
 | Plugin | Role |
 |--------|------|
-| [le-shop](https://github.com/logicencoder/le-shop) | App store catalogue + sync to Node backend |
+| [le-shop-plugin](https://github.com/logicencoder/le-shop-plugin) | App store catalogue + sync to Node backend |
 | [le-crypto-app-store](https://github.com/logicencoder/le-crypto-app-store) | Telegram shop + payments on SOL |
 
-Implementation: [le-settings](https://github.com/logicencoder/le-settings)
+Implementation (private): [le-settings-plugin](https://github.com/logicencoder/le-settings-plugin)
 
 ---
 

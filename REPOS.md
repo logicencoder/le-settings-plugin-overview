@@ -1,6 +1,6 @@
-# le-settings — repositories
+# le-settings-plugin — repositories
 
 | Repo | Role |
 |------|------|
-| **le-settings-overview** (this) | Marketing |
-| **le-settings** | Plugin source |
+| **le-settings-plugin-overview** (this) | Marketing |
+| **le-settings-plugin** | Plugin source (private) |
