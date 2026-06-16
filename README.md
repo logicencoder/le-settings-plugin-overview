@@ -6,6 +6,14 @@
 
 It is the lightweight **site-ops layer** beside the Logic Encoder theme and sibling plugins — enough signal to run production safely, export CSV evidence, and get paged on Telegram when something changes.
 
+Running a content-heavy WordPress site with trading dashboards, plugin fleet, and member flows means dozens of moving parts: brute-force probes on `wp-login.php`, crawlers hammering `/mexc/*` URLs, plugin activations after deploy, and the need to prove who hit what without opening phpMyAdmin. LE Settings centralises that work:
+
+- **Get Telegram alerts** when logins fail, roles change, or plugins toggle.
+- **Classify bots vs humans** with an editable User-Agent list for clean visitor analytics.
+- **Retain crawler, visitor, and login history** in wp-admin log tabs — paginate, export CSV, clear, or purge by IP/CIDR.
+- **Harden login** with progressive lockouts, honeypot, enumeration blocks, and session kill switches.
+- **Flip maintenance mode** or auto-update policy without SSH — while keeping `DISABLE_WP_CRON` + system cron documented in Status.
+
 ## Tech stack
 
 | Layer | Technologies |
@@ -17,18 +25,6 @@ It is the lightweight **site-ops layer** beside the Logic Encoder theme and sibl
 | Logging | Bot Log, Visitor Log, and Security Log tabs — paginated in wp-admin, CSV export |
 | Integration | `le_get_settings()` for theme and LE plugins; AJAX admin tools |
 | Hosting | WordPress on shared hosting; wp-admin only (no public shortcode UI) |
-
-## Why operators use it
-
-Running a content-heavy WordPress site with trading dashboards, plugin fleet, and member flows means dozens of moving parts: brute-force probes on `wp-login.php`, crawlers hammering `/mexc/*` URLs, plugin activations after deploy, and the need to prove who hit what without opening phpMyAdmin. LE Settings centralises that work:
-
-- **Get Telegram alerts** when logins fail, roles change, or plugins toggle.
-- **Classify bots vs humans** with an editable User-Agent list for clean visitor analytics.
-- **Retain crawler, visitor, and login history** in wp-admin log tabs — paginate, export CSV, clear, or purge by IP/CIDR.
-- **Harden login** with progressive lockouts, honeypot, enumeration blocks, and session kill switches.
-- **Flip maintenance mode** or auto-update policy without SSH — while keeping `DISABLE_WP_CRON` + system cron documented in Status.
-
-Front-end effects run on `init` / `template_redirect` / auth hooks; the admin UI is read-heavy on log tabs and write-heavy on configuration tabs.
 
 ## Admin console layout
 
