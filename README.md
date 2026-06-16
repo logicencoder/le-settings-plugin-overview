@@ -50,8 +50,6 @@ Nine tabs cover configuration and forensics:
 
 Configuration tabs use **Save Settings**; log tabs use export, pagination, and AJAX tools without touching the main save form.
 
-**Screenshot coverage (complete):** Portfolio images show the seven tabs where visual context matters — **Telegram**, **Protection**, **Bot Log**, **Visitor Log**, **Security Log**, and both **Status** views (feature grid + site information). **SEO & Bots**, **Redirects**, and **Debug** are plain configuration screens; they are documented in prose below and intentionally have no gallery images.
-
 ### Status — feature and notification grids
 
 The **Status** tab opens with two dense grids so you can answer “what is ON?” in one glance.
@@ -98,13 +96,31 @@ The **Protection** tab concentrates defences around `wp-login.php`, member conte
 
 ![Protection tab — brute force, IP lists, maintenance, auto-updates](assets/protection.png)
 
-## SEO, redirects, and bot classification
+## SEO and bot classification
 
-The **SEO & Bots** tab stores homepage meta description (with character counter), pagination noindex preference, and the editable **bot User-Agent list** that drives crawler detection (search engines, social preview bots, SEO tools, AI crawlers). **Bot tracking** and **visitor tracking** master switches sit here; **Skip logged-in users** avoids logging your own browsing. **Hide sensitive data in logs** masks IPs, URLs, and usernames in admin tables until you click to reveal or use **Show IP/URL** on a log tab.
+The **SEO & Bots** tab is where you shape how crawlers are treated and how traffic is classified before it hits the log tables.
 
-There is no row cap — bot and visitor history is retained in MySQL until you clear or delete by IP/CIDR.
+**Homepage meta description** is a textarea with a live character counter (aim for 150–160 characters). The counter turns green in the target band and warns when copy is too long — stored in `le_settings` for the Logic Encoder theme and integrations to emit on the public homepage.
 
-The **Redirects** tab edits a table of source paths with **301**, **302**, or **410** targets (JSON in `le_settings`). Theme and sibling plugins read rules via `le_get_settings()`; runtime redirect execution depends on the active integration layer.
+**Crawler and AI bot list** is a large editable User-Agent list (one token per line, `#` comments allowed). It seeds defaults for Googlebot, Bingbot, social preview bots, SEO tools, and AI crawlers (GPTBot, Claude, Perplexity, and similar). New recommended bots can be merged on plugin upgrade. The same list drives **robots.txt allow rules** when **Add Allow Rules in robots.txt** is enabled, and drives **bot vs human** routing for the Bot Log.
+
+**Tracking settings** group the master switches: **Enable Bot Visit Tracking**, **Enable Visitor Tracking**, **Skip Logged-in Users** (so your own admin browsing does not inflate visitor stats), and **Hide sensitive data in logs** (mask IPs, URLs, and usernames in admin tables until you click to reveal or use **Show IP/URL** on a log tab). Bot and visitor rows are stored in MySQL with **unlimited retention** — no automatic prune — until you clear a table or delete by IP/CIDR from Security Log tools.
+
+Built-in skips (not configurable in the UI) always drop localhost, private LAN ranges, wp-cron/CLI, Hostinger origin (`92.113.0.0/16`), wp-admin referrers, and empty User-Agent hits from the visitor log.
+
+**Pagination SEO** adds `noindex, follow` on paginated archive pages (`/page/2/` and above) when enabled.
+
+## Redirect manager
+
+The **Redirects** tab is a visual **Redirect Manager** for path rules stored as JSON in `le_settings`. Each row has **From (path)**, **To** (destination URL or path), and **Type**:
+
+| Type | Behaviour |
+|------|-----------|
+| **301 Permanent** | Classic permanent move |
+| **302 Temporary** | Short-lived redirect |
+| **410 Gone** | Leave **To** empty — resource removed |
+
+Use **+ Add Rule** to grow the table; **✕** removes a row. On save, rules are validated JSON for theme and sibling plugins to consume via `le_get_settings()`. Runtime redirect execution depends on the active integration layer on the site.
 
 ## Bot and visitor tracking
 
@@ -130,9 +146,25 @@ The **Login attempt log** lists **Time**, **Event** (attempt vs lockout badge), 
 
 ![Security Log — lockout summary and login attempt table](assets/security-log.png)
 
-## Debug and production hygiene
+## Debug and log triage
 
-The **Debug** tab controls three switches mapped to `wp-config.php`: **WP_DEBUG**, **WP_DEBUG_LOG**, and **WP_DEBUG_DISPLAY**. On production, keep debug logging **OFF** so plugins cannot fill `wp-content/debug.log`; use the in-admin tail viewer only during active incidents. **Display errors** should stay off on public sites.
+The **Debug** tab (🐛 in the tab bar) is the operator console for WordPress diagnostics — separate from Telegram alerts and separate from the MySQL request logs.
+
+**WordPress Debug** exposes three switches that sync to `wp-config.php` when the file is writable:
+
+| Switch | Constant | Role |
+|--------|----------|------|
+| **WP Debug** | `WP_DEBUG` | Master debug mode (required before logging works) |
+| **Debug Log File** | `WP_DEBUG_LOG` | Writes PHP notices/errors to `wp-content/debug.log` |
+| **Show Errors on Site** | `WP_DEBUG_DISPLAY` | Must stay **OFF** on public sites — visitors must not see stack traces |
+
+The panel shows **on disk** values read back from `wp-config.php` so you can spot drift between LE Settings and manual edits. If `wp-config.php` is not writable, toggles still save in options but you must edit constants manually.
+
+**Debug Log** is an in-admin viewer for `wp-content/debug.log` — no FTP required. **Refresh** loads the tail of the file; **Clear log** wipes it after you have captured evidence. File size is shown beside the buttons. When logging is off, the UI prompts you to enable **WP Debug** + **Debug Log File** and save.
+
+On the **Status** tab, the same debug switches appear in the **Site features** grid as **WP Debug**, **Debug Log File**, and **Show Errors on Site** — quick ON/OFF badges without opening the Debug tab. Use **Debug** when you need the live log stream; use **Status** for a fleet-wide health snapshot.
+
+For production, keep **Debug Log File** off unless you are actively investigating — third-party plugins can be noisy. LE Settings request logs (bot/visitor/security) always live in MySQL tables, not in `debug.log`.
 
 ## Site information panel
 
