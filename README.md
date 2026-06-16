@@ -1,6 +1,6 @@
 # LE Settings — WordPress plugin
 
-![Logic Encoder Settings — feature and notification overview](assets/featured.png)
+![Logic Encoder Settings — Telegram alerts and notification checklists](assets/featured-hero.png)
 
 **LE Settings** is the operator control plane for [logicencoder.com](https://logicencoder.com): one wp-admin home for **security hardening**, **Telegram incident alerts**, **crawler vs human request logging**, **maintenance mode**, and **WordPress housekeeping**. You configure behaviour once; lockouts, headers, 503 pages, bot classification, and log rows apply on every front-end request without a separate SaaS dashboard.
 
