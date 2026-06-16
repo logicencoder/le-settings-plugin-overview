@@ -168,8 +168,6 @@ On the **Status** tab, the same debug switches appear in the **Site features** g
 
 The lower **Status** card lists WordPress and PHP versions, memory limit and current usage, active theme and plugin count, database size, SSL state, debug flags as read from disk, cron mode (**visit-trigger disabled** when `DISABLE_WP_CRON` is set — system cron runs `wp-cron.php`), LE auto-update policy, timezone, log row counts with **unlimited retention**, last bot/visitor timestamps, failed logins today, active lockouts, Telegram throttle usage, your current IP (for whitelist copy-paste), and LE schema version.
 
-![Status — site information and log health](assets/status-site-info.png)
-
 ## Sibling products
 
 | Product | Relationship |
