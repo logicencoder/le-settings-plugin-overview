@@ -18,6 +18,17 @@ The plugin is **not** the Telegram Mini App shop ([le-shop-plugin](https://githu
 | Integration | `le_get_settings()` for theme and LE plugins; AJAX admin tools |
 | Hosting | WordPress on shared hosting; wp-admin only (no public shortcode UI) |
 
+## Where logs live (important)
+
+LE Settings uses **two different channels**. Do not mix them up:
+
+| Data | Where it goes |
+|------|----------------|
+| **Bot visits**, **human visitors**, **failed logins / lockouts** | **MySQL tables** (`wp_le_bot_log`, `wp_le_visitor_log`, `wp_le_bf_log`) — one row per event, CSV export from wp-admin |
+| **PHP / plugin errors** (only when you turn it on) | Text file `wp-content/debug.log` via WordPress `WP_DEBUG_LOG` — viewed on the **Debug** tab, not mixed with visitor/bot rows |
+
+Normal site tracking **does not write** bot or visitor hits to `debug.log` or any other file on disk. Those requests are **INSERT into the database** on each front-end hit. The Debug tab and `debug.log` are for **incident triage** (PHP notices, third-party plugin noise), not for analytics.
+
 ## Why operators use it
 
 Running a content-heavy WordPress site with trading dashboards, plugin fleet, and member flows means dozens of moving parts: brute-force probes on `wp-login.php`, crawlers hammering `/mexc/*` URLs, plugin activations after deploy, and the need to prove who hit what without opening phpMyAdmin. LE Settings centralises that work:
