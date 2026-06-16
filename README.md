@@ -4,7 +4,7 @@
 
 **LE Settings** is the operator control plane for [logicencoder.com](https://logicencoder.com): one wp-admin home for **security hardening**, **Telegram incident alerts**, **crawler vs human request logging**, **maintenance mode**, and **WordPress housekeeping**. You configure behaviour once; lockouts, headers, 503 pages, bot classification, and log rows apply on every front-end request without a separate SaaS dashboard.
 
-The plugin is **not** the Telegram Mini App shop ([le-shop-plugin](https://github.com/logicencoder/le-shop-plugin-overview)), not the crypto app store backend, and not the deep analytics product ([wp-visitor-stats-plugin](https://github.com/logicencoder/wp-visitor-stats-plugin-overview)). It is the lightweight **site-ops layer** that sits beside the Logic Encoder theme and sibling plugins — enough signal to run production safely, export CSV evidence, and get paged on Telegram when something changes.
+It is the lightweight **site-ops layer** beside the Logic Encoder theme and sibling plugins — enough signal to run production safely, export CSV evidence, and get paged on Telegram when something changes.
 
 ## Tech stack
 
@@ -18,24 +18,17 @@ The plugin is **not** the Telegram Mini App shop ([le-shop-plugin](https://githu
 | Integration | `le_get_settings()` for theme and LE plugins; AJAX admin tools |
 | Hosting | WordPress on shared hosting; wp-admin only (no public shortcode UI) |
 
-## Where logs live (important)
+## Request logging
 
-LE Settings uses **two different channels**. Do not mix them up:
-
-| Data | Where it goes |
-|------|----------------|
-| **Bot visits**, **human visitors**, **failed logins / lockouts** | **MySQL tables** (`wp_le_bot_log`, `wp_le_visitor_log`, `wp_le_bf_log`) — one row per event, CSV export from wp-admin |
-| **PHP / plugin errors** (only when you turn it on) | Text file `wp-content/debug.log` via WordPress `WP_DEBUG_LOG` — viewed on the **Debug** tab, not mixed with visitor/bot rows |
-
-Normal site tracking **does not write** bot or visitor hits to `debug.log` or any other file on disk. Those requests are **INSERT into the database** on each front-end hit. The Debug tab and `debug.log` are for **incident triage** (PHP notices, third-party plugin noise), not for analytics.
+Bot visits, human visitors, and login security events are stored in **MySQL tables** (`wp_le_bot_log`, `wp_le_visitor_log`, `wp_le_bf_log`). Each qualifying front-end request adds one row. You paginate, export CSV, clear tables, or purge by IP/CIDR from wp-admin.
 
 ## Why operators use it
 
 Running a content-heavy WordPress site with trading dashboards, plugin fleet, and member flows means dozens of moving parts: brute-force probes on `wp-login.php`, crawlers hammering `/mexc/*` URLs, plugin activations after deploy, and the need to prove who hit what without opening phpMyAdmin. LE Settings centralises that work:
 
-- **React on Telegram** when logins fail, roles change, or plugins toggle — instead of discovering it hours later in a log file.
-- **Separate bots from humans** with an editable User-Agent list so SEO crawlers do not pollute visitor analytics.
-- **Retain full request history in MySQL** (no row cap) for audits, CSV export, and IP-range purge when cleaning noise.
+- **Get Telegram alerts** when logins fail, roles change, or plugins toggle.
+- **Classify bots vs humans** with an editable User-Agent list for clean visitor analytics.
+- **Retain full request history in MySQL** for audits, CSV export, and IP-range purge.
 - **Harden login** with progressive lockouts, honeypot, enumeration blocks, and session kill switches.
 - **Flip maintenance mode** or auto-update policy without SSH — while keeping `DISABLE_WP_CRON` + system cron documented in Status.
 
@@ -159,23 +152,19 @@ The **Login attempt log** lists **Time**, **Event** (attempt vs lockout badge), 
 
 ## Debug and log triage
 
-The **Debug** tab (🐛 in the tab bar) is the operator console for WordPress diagnostics — separate from Telegram alerts and separate from the MySQL request logs.
-
-**WordPress Debug** exposes three switches that sync to `wp-config.php` when the file is writable:
+The **Debug** tab is the operator console for WordPress diagnostics: three switches sync to `wp-config.php` when writable, plus an in-admin tail viewer for `wp-content/debug.log` with **Refresh** and **Clear log**.
 
 | Switch | Constant | Role |
 |--------|----------|------|
 | **WP Debug** | `WP_DEBUG` | Master debug mode (required before logging works) |
 | **Debug Log File** | `WP_DEBUG_LOG` | Writes PHP notices/errors to `wp-content/debug.log` |
-| **Show Errors on Site** | `WP_DEBUG_DISPLAY` | Must stay **OFF** on public sites — visitors must not see stack traces |
+| **Show Errors on Site** | `WP_DEBUG_DISPLAY` | Keep **OFF** on public sites |
 
-The panel shows **on disk** values read back from `wp-config.php` so you can spot drift between LE Settings and manual edits. If `wp-config.php` is not writable, toggles still save in options but you must edit constants manually.
+The panel shows **on disk** values read back from `wp-config.php`. When `wp-config.php` is writable, saves apply automatically; otherwise edit constants manually.
 
 **Debug Log** is an in-admin viewer for `wp-content/debug.log` — no FTP required. **Refresh** loads the tail of the file; **Clear log** wipes it after you have captured evidence. File size is shown beside the buttons. When logging is off, the UI prompts you to enable **WP Debug** + **Debug Log File** and save.
 
-On the **Status** tab, the same debug switches appear in the **Site features** grid as **WP Debug**, **Debug Log File**, and **Show Errors on Site** — quick ON/OFF badges without opening the Debug tab. Use **Debug** when you need the live log stream; use **Status** for a fleet-wide health snapshot.
-
-For production, keep **Debug Log File** off unless you are actively investigating — third-party plugins can be noisy. LE Settings request logs (bot/visitor/security) always live in MySQL tables, not in `debug.log`.
+On the **Status** tab, the same debug switches appear in the **Site features** grid as **WP Debug**, **Debug Log File**, and **Show Errors on Site** — quick ON/OFF badges without opening the Debug tab.
 
 ![Debug tab — WP_DEBUG switches and in-admin log viewer](assets/debug.png)
 
