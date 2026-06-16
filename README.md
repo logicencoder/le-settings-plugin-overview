@@ -11,16 +11,12 @@ It is the lightweight **site-ops layer** beside the Logic Encoder theme and sibl
 | Layer | Technologies |
 |-------|--------------|
 | WordPress plugin | PHP single-file (`le-settings.php`, ~4.3k LOC), inline admin CSS/JS |
-| Persistence | WordPress options (`le_settings` blob) + MySQL log tables |
+| Persistence | WordPress options + MySQL |
 | Alerts | Telegram Bot API (`sendMessage`, HTML), optional geo line via ip-api.com |
 | Security | Login hooks, transients, IP CIDR matching, optional response headers |
-| Logging | `{prefix}le_bot_log`, `{prefix}le_visitor_log`, `{prefix}le_bf_log` |
+| Logging | Bot Log, Visitor Log, and Security Log tabs — paginated in wp-admin, CSV export |
 | Integration | `le_get_settings()` for theme and LE plugins; AJAX admin tools |
 | Hosting | WordPress on shared hosting; wp-admin only (no public shortcode UI) |
-
-## Request logging
-
-Bot visits, human visitors, and login security events are stored in **MySQL tables** (`wp_le_bot_log`, `wp_le_visitor_log`, `wp_le_bf_log`). Each qualifying front-end request adds one row. You paginate, export CSV, clear tables, or purge by IP/CIDR from wp-admin.
 
 ## Why operators use it
 
@@ -28,7 +24,7 @@ Running a content-heavy WordPress site with trading dashboards, plugin fleet, an
 
 - **Get Telegram alerts** when logins fail, roles change, or plugins toggle.
 - **Classify bots vs humans** with an editable User-Agent list for clean visitor analytics.
-- **Retain full request history in MySQL** for audits, CSV export, and IP-range purge.
+- **Retain crawler, visitor, and login history** in wp-admin log tabs — paginate, export CSV, clear, or purge by IP/CIDR.
 - **Harden login** with progressive lockouts, honeypot, enumeration blocks, and session kill switches.
 - **Flip maintenance mode** or auto-update policy without SSH — while keeping `DISABLE_WP_CRON` + system cron documented in Status.
 
@@ -92,25 +88,25 @@ The **Protection** tab concentrates defences around `wp-login.php`, member conte
 
 **Advanced security** adds a login honeypot (hidden field bots fill), blocks user enumeration via author archives and trimmed REST user endpoints, and optionally sends `X-Content-Type-Options`, `X-Frame-Options`, and `Referrer-Policy` on front-end responses.
 
-**IP blacklist** returns HTTP 403 for listed ranges before WordPress renders a page. **IP whitelist (global)** skips blacklist, brute-force tracking, **and** visitor logging — use for operator nets. Built-in logic also skips localhost, private LAN ranges, Hostinger origin noise (`92.113.0.0/16`), wp-admin referrers, and empty User-Agent rows so internal fetches do not flood the visitor log.
+**IP blacklist** returns HTTP 403 for listed ranges before WordPress renders a page. **IP whitelist (global)** skips blacklist, brute-force tracking, **and** visitor logging — use for operator nets. Built-in logic also skips localhost, private LAN ranges, shared-hosting origin noise, wp-admin referrers, and empty User-Agent rows so internal fetches do not flood the visitor log.
 
 **Maintenance mode** serves a custom **503** with `Retry-After` to anonymous visitors while administrators keep wp-admin access.
 
-**WordPress auto-updates** exposes core / plugin / theme toggles even when Hostinger mu-plugins hide the default UI — so you choose unattended patches deliberately.
+**WordPress auto-updates** exposes core / plugin / theme toggles even when managed-hosting mu-plugins hide the default UI — so you choose unattended patches deliberately.
 
 ![Protection tab — brute force, IP lists, maintenance, auto-updates](assets/protection.png)
 
 ## SEO and bot classification
 
-The **SEO & Bots** tab is where you shape how crawlers are treated and how traffic is classified before it hits the log tables.
+The **SEO & Bots** tab is where you shape how crawlers are treated and how traffic is classified before rows land in the Bot or Visitor logs.
 
 **Homepage meta description** is a textarea with a live character counter (aim for 150–160 characters). The counter turns green in the target band and warns when copy is too long — stored in `le_settings` for the Logic Encoder theme and integrations to emit on the public homepage.
 
 **Crawler and AI bot list** is a large editable User-Agent list (one token per line, `#` comments allowed). It seeds defaults for Googlebot, Bingbot, social preview bots, SEO tools, and AI crawlers (GPTBot, Claude, Perplexity, and similar). New recommended bots can be merged on plugin upgrade. The same list drives **robots.txt allow rules** when **Add Allow Rules in robots.txt** is enabled, and drives **bot vs human** routing for the Bot Log.
 
-**Tracking settings** group the master switches: **Enable Bot Visit Tracking**, **Enable Visitor Tracking**, **Skip Logged-in Users** (so your own admin browsing does not inflate visitor stats), and **Hide sensitive data in logs** (mask IPs, URLs, and usernames in admin tables until you click to reveal or use **Show IP/URL** on a log tab). Bot and visitor rows are stored in MySQL with **unlimited retention** — no automatic prune — until you clear a table or delete by IP/CIDR from Security Log tools.
+**Tracking settings** group the master switches: **Enable Bot Visit Tracking**, **Enable Visitor Tracking**, **Skip Logged-in Users** (so your own admin browsing does not inflate visitor stats), and **Hide sensitive data in logs** (mask IPs, URLs, and usernames in admin tables until you click to reveal or use **Show IP/URL** on a log tab). Bot and visitor history uses **unlimited retention** — no automatic prune — until you clear a log tab or delete by IP/CIDR from Security Log tools.
 
-Built-in skips (not configurable in the UI) always drop localhost, private LAN ranges, wp-cron/CLI, Hostinger origin (`92.113.0.0/16`), wp-admin referrers, and empty User-Agent hits from the visitor log.
+Built-in skips (not configurable in the UI) always drop localhost, private LAN ranges, wp-cron/CLI, shared-hosting origin traffic, wp-admin referrers, and empty User-Agent hits from the visitor log.
 
 **Pagination SEO** adds `noindex, follow` on paginated archive pages (`/page/2/` and above) when enabled.
 
@@ -144,7 +140,7 @@ This is intentionally lighter than wp-visitor-stats (no heatmaps or session repl
 
 The **Security Log** tab summarises **failed logins total**, **total events**, **failed today**, **total lockouts**, and **active lockouts** in stat cards at the top.
 
-**Manual IP unblock** accepts a single IPv4 and clears brute-force transients. **Delete records by IP / CIDR** removes matching rows from visitor, bot, and/or security tables — useful after cleaning a datacenter range (e.g. hosting-origin noise).
+**Manual IP unblock** accepts a single IPv4 and clears brute-force transients. **Delete records by IP / CIDR** removes matching rows from the Bot, Visitor, and/or Security logs — useful after cleaning a datacenter range (e.g. hosting-origin noise).
 
 The **Login attempt log** lists **Time**, **Event** (attempt vs lockout badge), **IP**, **Country**, **Username**, and **Unblock** per row. Export CSV for incident records; clear resets the table when you are done investigating.
 
@@ -170,7 +166,7 @@ On the **Status** tab, the same debug switches appear in the **Site features** g
 
 ## Site information panel
 
-The lower **Status** card lists WordPress and PHP versions, memory limit and current usage, active theme and plugin count, database size, SSL state, debug flags as read from disk, cron mode (**visit-trigger disabled** when `DISABLE_WP_CRON` is set — system cron runs `wp-cron.php`), LE auto-update policy, timezone, log table counts with **unlimited retention**, last bot/visitor timestamps, failed logins today, active lockouts, Telegram throttle usage, your current IP (for whitelist copy-paste), and LE schema version.
+The lower **Status** card lists WordPress and PHP versions, memory limit and current usage, active theme and plugin count, database size, SSL state, debug flags as read from disk, cron mode (**visit-trigger disabled** when `DISABLE_WP_CRON` is set — system cron runs `wp-cron.php`), LE auto-update policy, timezone, log row counts with **unlimited retention**, last bot/visitor timestamps, failed logins today, active lockouts, Telegram throttle usage, your current IP (for whitelist copy-paste), and LE schema version.
 
 ![Status — site information and log health](assets/status-site-info.png)
 
