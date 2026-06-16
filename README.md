@@ -180,4 +180,49 @@ See [REPOS.md](REPOS.md).
 
 ---
 
+## Feature examples (two per capability)
+
+#### Logic Encoder admin home
+1. You open **Logic Encoder** in wp-admin and read live counters for bots logged, visitors logged, and failed logins before opening any tab.
+2. You switch among nine tabs from one menu when you need Telegram, protection, logs, or debug in a single session.
+
+#### Telegram incident alerts
+1. You enter bot token and chat ID, enable the channels you care about, and click **Test message** to confirm delivery.
+2. You enable **Alert Throttling** and watch the hourly counter so a brute-force storm does not exhaust your bot quota.
+
+#### Login and site protection
+1. You turn on progressive brute-force lockout and whitelist office CIDR lines so your team never locks itself out during testing.
+2. You flip **Maintenance mode** and anonymous visitors receive your custom **503** while you keep wp-admin access for fixes.
+
+#### SEO and bot classification
+1. You write the homepage meta description and use the character counter to stay in the recommended band for search snippets.
+2. You edit the crawler User-Agent list so known bots route to the Bot Log instead of visitor analytics.
+
+#### Redirect manager
+1. You add a **301** row when you retire an old path without editing `.htaccess` by hand.
+2. You create a **410 Gone** rule when a removed tool URL should stop returning soft 404s.
+
+#### Bot Log forensics
+1. You scan the top-crawler bar chart and paginated table to see which bots hit which URLs overnight.
+2. You export **CSV** or click **Show IP/URL** when you need unmasked endpoints for a security ticket.
+
+#### Visitor Log analytics
+1. You review **Top countries** and the human-traffic table when you spot probe paths on login URLs.
+2. You export visitor rows to **CSV** for a lightweight traffic review without the full wp-visitor-stats stack.
+
+#### Security Log and IP hygiene
+1. You read failed-login stat cards, then **Unblock** a single IP after a false positive.
+2. You delete log rows by **IP or CIDR** across Bot, Visitor, and Security logs after cleaning datacenter noise.
+
+#### Debug and Status consoles
+1. You enable **WP Debug** and **Debug Log File** from the **Debug** tab and tail `debug.log` in wp-admin without FTP.
+2. You open **Status** and scan ON/OFF badges for every protection toggle before a deploy sign-off.
+
+#### Theme integration (operator)
+1. You save settings once and the Logic Encoder theme reads homepage meta and redirect JSON through `le_get_settings()`.
+2. You confirm cron mode on **Status** shows system cron when `DISABLE_WP_CRON` is set so scheduled tasks still run.
+
+
+---
+
 **Made by [Logic Encoder](https://logicencoder.com)** · [GitHub](https://github.com/logicencoder) · [Contact](https://logicencoder.com/contact/)
