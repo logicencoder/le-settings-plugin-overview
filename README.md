@@ -50,6 +50,8 @@ Nine tabs cover configuration and forensics:
 
 Configuration tabs use **Save Settings**; log tabs use export, pagination, and AJAX tools without touching the main save form.
 
+**Screenshot coverage (complete):** Portfolio images show the seven tabs where visual context matters — **Telegram**, **Protection**, **Bot Log**, **Visitor Log**, **Security Log**, and both **Status** views (feature grid + site information). **SEO & Bots**, **Redirects**, and **Debug** are plain configuration screens; they are documented in prose below and intentionally have no gallery images.
+
 ### Status — feature and notification grids
 
 The **Status** tab opens with two dense grids so you can answer “what is ON?” in one glance.
