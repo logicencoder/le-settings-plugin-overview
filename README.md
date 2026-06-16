@@ -166,6 +166,8 @@ On the **Status** tab, the same debug switches appear in the **Site features** g
 
 For production, keep **Debug Log File** off unless you are actively investigating — third-party plugins can be noisy. LE Settings request logs (bot/visitor/security) always live in MySQL tables, not in `debug.log`.
 
+![Debug tab — WP_DEBUG switches and in-admin log viewer](assets/debug.png)
+
 ## Site information panel
 
 The lower **Status** card lists WordPress and PHP versions, memory limit and current usage, active theme and plugin count, database size, SSL state, debug flags as read from disk, cron mode (**visit-trigger disabled** when `DISABLE_WP_CRON` is set — system cron runs `wp-cron.php`), LE auto-update policy, timezone, log table counts with **unlimited retention**, last bot/visitor timestamps, failed logins today, active lockouts, Telegram throttle usage, your current IP (for whitelist copy-paste), and LE schema version.
