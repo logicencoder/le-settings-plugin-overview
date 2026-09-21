@@ -180,7 +180,7 @@ See [REPOS.md](REPOS.md).
 
 ---
 
-## Feature examples (two per capability)
+## Operator workflows
 
 #### Logic Encoder admin home
 1. You open **Logic Encoder** in wp-admin and read live counters for bots logged, visitors logged, and failed logins before opening any tab.
