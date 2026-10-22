@@ -1,228 +1,54 @@
-# LE Settings — WordPress plugin
+# LE Settings
 
-![Logic Encoder Settings — Telegram alerts and notification checklists](assets/featured-hero.png)
+![LE Settings workspace](assets/featured-hero.png)
 
-**LE Settings** is the operator control plane for [logicencoder.com](https://logicencoder.com): one wp-admin home for **security hardening**, **Telegram incident alerts**, **crawler vs human request logging**, **maintenance mode**, and **WordPress housekeeping**. You configure behaviour once; lockouts, headers, 503 pages, bot classification, and log rows apply on every front-end request without a separate SaaS dashboard.
-
-It is the lightweight **site-ops layer** beside the Logic Encoder theme and sibling plugins — enough signal to run production safely, export CSV evidence, and get paged on Telegram when something changes.
-
-Running a content-heavy WordPress site with trading dashboards, plugin fleet, and member flows means dozens of moving parts: brute-force probes on `wp-login.php`, crawlers hammering `/mexc/*` URLs, plugin activations after deploy, and the need to prove who hit what without opening phpMyAdmin. LE Settings centralises that work:
-
-- **Get Telegram alerts** when logins fail, roles change, or plugins toggle.
-- **Classify bots vs humans** with an editable User-Agent list for clean visitor analytics.
-- **Retain crawler, visitor, and login history** in wp-admin log tabs — paginate, export CSV, clear, or purge by IP/CIDR.
-- **Harden login** with progressive lockouts, honeypot, enumeration blocks, and session kill switches.
-- **Flip maintenance mode** or auto-update policy without SSH — while keeping `DISABLE_WP_CRON` + system cron documented in Status.
+Site operations often become a collection of unrelated settings pages, alerts and logs. LE Settings brings the site's supported operational controls into one WordPress console, helping the owner review protection, notifications and publishing-related preferences with less switching.
 
 ## Tech stack
 
 | Layer | Technologies |
-|-------|--------------|
-| WordPress plugin | PHP single-file (`le-settings.php`, ~4.3k LOC), inline admin CSS/JS |
-| Persistence | WordPress options + MySQL |
-| Alerts | Telegram Bot API (`sendMessage`, HTML), optional geo line via ip-api.com |
-| Security | Login hooks, transients, IP CIDR matching, optional response headers |
-| Logging | Bot Log, Visitor Log, and Security Log tabs — paginated in wp-admin, CSV export |
-| Integration | `le_get_settings()` for theme and LE plugins; AJAX admin tools |
-| Hosting | WordPress on shared hosting; wp-admin only (no public shortcode UI) |
+|---|---|
+| Application | PHP, WordPress |
+| Supporting technologies | HTML, CSS, JavaScript; Telegram |
 
-## Admin console layout
+## See the current site setup
 
-Top-level wp-admin menu **Logic Encoder** (shield icon, early sidebar). The header shows four live counters: **bots logged**, **visitors logged**, **failed logins total**, and **failed logins today** — so you see incident pressure before opening a tab.
+The status area organises enabled features and notification choices into a readable overview. It helps an operator check the site's intended behaviour before investigating a particular issue. Related controls remain close to the information they affect.
 
-Nine tabs cover configuration and forensics:
+![LE Settings — See the current site setup](assets/status-features.png)
 
-| Tab | Purpose |
-|-----|---------|
-| **Telegram** | Bot token, chat ID, throttle, grouped notification toggles, test send |
-| **Protection** | Brute force, IP lists, sessions, honeypot, maintenance, auto-updates |
-| **SEO & Bots** | Homepage meta field, bot UA list, tracking toggles, sensitive-field masking |
-| **Redirects** | Editable 301 / 302 / 410 rule table (JSON-backed) |
-| **Bot Log** | Crawler volume bars + paginated table, CSV export, clear |
-| **Visitor Log** | Human traffic summary, top countries, paginated table, CSV export |
-| **Security Log** | Login attempts, lockouts, manual unblock, delete-by-IP/CIDR |
-| **Debug** | `WP_DEBUG` triad synced to `wp-config.php` + tail of `debug.log` |
-| **Status** | Feature grid, notification grid, site info (WP/PHP/SSL/cron) |
+## Keep important events visible
 
-Configuration tabs use **Save Settings**; log tabs use export, pagination, and AJAX tools without touching the main save form.
+Telegram notifications provide a way to receive selected site events away from the administration screen. Notification choices let the owner decide which events deserve attention. Logs provide a place to review the corresponding activity when more detail is needed.
 
-### Status — feature and notification grids
+![LE Settings — Keep important events visible](assets/telegram.png)
 
-The **Status** tab opens with two dense grids so you can answer “what is ON?” in one glance.
+## Maintain protection and access preferences
 
-**Site features** lists protection, tracking, SEO, and UI toggles (maintenance, brute force, honeypot, bot/visitor tracking, hide sensitive fields in logs, pagination noindex, plugin menu highlighting, and more). Each row is a label with an **ON** / **OFF** badge — green when active, red when disabled — so misconfiguration stands out before you drill into a tab.
+Protection and login-related controls cover supported hardening choices. Security logs and IP-management tools assist with investigation and routine maintenance. The public value is operational visibility and configurable protection, not a disclosure of the site's internal defensive mechanisms.
 
-**Telegram notifications** mirrors the same pattern for alert channels: security events (login, logout, failed login, lockout, password reset, role change, user delete), content events (register, post, comment, spam), and system events (core/plugin lifecycle, 404, PHP fatal). The master **Telegram** switch and **Alert Throttling** appear here too; throttling caps messages per hour so a brute-force storm does not exhaust your bot quota.
+![LE Settings — Maintain protection and access preferences](assets/protection.png)
 
-![Status tab — site features and Telegram notification matrix](assets/status-features.png)
+![LE Settings — Maintain protection and access preferences](assets/security-log.png)
 
-## Telegram alerts
+## Manage publishing and traffic context
 
-The **Telegram** tab wires the site to a private bot chat. Three credential fields gate everything: **Enable Telegram Notifications**, **Bot Token**, and **Chat ID** (masked in the UI). **Include Country & Flag** appends a geo line from the client IP when ip-api lookup succeeds. **Alert Throttling** limits messages per hour with a live counter so you know how close you are to the cap.
+SEO preferences, crawler-related choices and redirects support keeping the site's public behaviour organised. Bot and visitor views help inspect traffic context. These tools bring related operational decisions together without making the console a substitute for the site's content editor.
 
-Notifications are grouped into checklists:
+![LE Settings — Manage publishing and traffic context](assets/bot-log.png)
 
-| Group | What you can enable |
-|-------|---------------------|
-| **Security** | Successful login, logout, failed login, brute-force lockout, password reset, role change, user deleted |
-| **Content** | Registration, new post, post updated, media upload, comment, approved, spam |
-| **System** | Core updated, plugin activated / deactivated / deleted, 404 hit, PHP fatal on shutdown |
+![LE Settings — Manage publishing and traffic context](assets/visitor-log.png)
 
-**Test message** sends immediately — no need to trigger a real failure to validate token and chat ID. Toggles only control Telegram output; the underlying security behaviour (e.g. lockout thresholds) lives under **Protection**.
+## Investigate and adapt
 
-![Telegram tab — credentials, throttle, and notification checklists](assets/telegram.png)
+Debug information, site details and log filtering help narrow an issue when the summary is insufficient. The shared console makes recurring checks easier to find. It complements the site's shop and member plugins while retaining its own operational role.
 
-## Protection and login hardening
+![LE Settings — Investigate and adapt](assets/debug.png)
 
-The **Protection** tab concentrates defences around `wp-login.php`, member content, and session hygiene.
-
-**Page & content protection** toggles redirect guests away from protected routes, hide excerpts from crawlers, and emit noindex on premium paths — complementary to theme templates.
-
-**User session manager** loads active sessions per user and supports **kill all sessions** over AJAX when an account is compromised.
-
-**Brute-force lockout** counts failures per IP in a sliding window. Exceed **Max Failed Attempts** → timed lockout written to options and the security log. **Progressive penalties** multiply duration for repeat offenders. **IP whitelist (brute force)** accepts CIDR lines so office or VPN exits never lock you out during testing.
-
-**Advanced security** adds a login honeypot (hidden field bots fill), blocks user enumeration via author archives and trimmed REST user endpoints, and optionally sends `X-Content-Type-Options`, `X-Frame-Options`, and `Referrer-Policy` on front-end responses.
-
-**IP blacklist** returns HTTP 403 for listed ranges before WordPress renders a page. **IP whitelist (global)** skips blacklist, brute-force tracking, **and** visitor logging — use for operator nets. Built-in logic also skips localhost, private LAN ranges, shared-hosting origin noise, wp-admin referrers, and empty User-Agent rows so internal fetches do not flood the visitor log.
-
-**Maintenance mode** serves a custom **503** with `Retry-After` to anonymous visitors while administrators keep wp-admin access.
-
-**WordPress auto-updates** exposes core / plugin / theme toggles even when managed-hosting mu-plugins hide the default UI — so you choose unattended patches deliberately.
-
-![Protection tab — brute force, IP lists, maintenance, auto-updates](assets/protection.png)
-
-## SEO and bot classification
-
-The **SEO & Bots** tab is where you shape how crawlers are treated and how traffic is classified before rows land in the Bot or Visitor logs.
-
-**Homepage meta description** is a textarea with a live character counter (aim for 150–160 characters). The counter turns green in the target band and warns when copy is too long — stored in `le_settings` for the Logic Encoder theme and integrations to emit on the public homepage.
-
-**Crawler and AI bot list** is a large editable User-Agent list (one token per line, `#` comments allowed). It seeds defaults for Googlebot, Bingbot, social preview bots, SEO tools, and AI crawlers (GPTBot, Claude, Perplexity, and similar). New recommended bots can be merged on plugin upgrade. The same list drives **robots.txt allow rules** when **Add Allow Rules in robots.txt** is enabled, and drives **bot vs human** routing for the Bot Log.
-
-**Tracking settings** group the master switches: **Enable Bot Visit Tracking**, **Enable Visitor Tracking**, **Skip Logged-in Users** (so your own admin browsing does not inflate visitor stats), and **Hide sensitive data in logs** (mask IPs, URLs, and usernames in admin tables until you click to reveal or use **Show IP/URL** on a log tab). Bot and visitor history uses **unlimited retention** — no automatic prune — until you clear a log tab or delete by IP/CIDR from Security Log tools.
-
-Built-in skips (not configurable in the UI) always drop localhost, private LAN ranges, wp-cron/CLI, shared-hosting origin traffic, wp-admin referrers, and empty User-Agent hits from the visitor log.
-
-**Pagination SEO** adds `noindex, follow` on paginated archive pages (`/page/2/` and above) when enabled.
-
-## Redirect manager
-
-The **Redirects** tab is a visual **Redirect Manager** for path rules stored as JSON in `le_settings`. Each row has **From (path)**, **To** (destination URL or path), and **Type**:
-
-| Type | Behaviour |
-|------|-----------|
-| **301 Permanent** | Classic permanent move |
-| **302 Temporary** | Short-lived redirect |
-| **410 Gone** | Leave **To** empty — resource removed |
-
-Use **+ Add Rule** to grow the table; **✕** removes a row. On save, rules are validated JSON for theme and sibling plugins to consume via `le_get_settings()`. Runtime redirect execution depends on the active integration layer on the site.
-
-## Bot and visitor tracking
-
-On each front-end request the plugin classifies traffic: UA tokens from the bot list → **Bot Log**; otherwise human → **Visitor Log** unless skipped (see Protection whitelist and built-in skips).
-
-**Bot Log** opens with summary cards (total visits, unique bot names) and a horizontal bar chart of the top crawlers by volume. The table columns are **Time**, **Bot**, **IP**, **Country**, and **URL** with pagination, **Export CSV**, **Show IP/URL**, and **Clear**. Masked IPs display as partial octets until revealed — suitable for sharing screenshots without publishing full crawler endpoints.
-
-![Bot Log — volume chart and paginated crawler table](assets/bot-log.png)
-
-**Visitor Log** adds **Real visitor analytics**: total logged, today’s count, and **Top countries** breakdown. The table adds **OS**, **Browser**, **Device**, **Referrer**, and **User** (when logged in). Use it to spot probe paths, login page hits, and referrer anomalies without deploying the full wp-visitor-stats stack.
-
-![Visitor Log — country summary and human traffic table](assets/visitor-log.png)
-
-This is intentionally lighter than wp-visitor-stats (no heatmaps or session replay) — enough for security review and crawler volume on a busy trading-content site.
-
-## Security log and IP hygiene
-
-The **Security Log** tab summarises **failed logins total**, **total events**, **failed today**, **total lockouts**, and **active lockouts** in stat cards at the top.
-
-**Manual IP unblock** accepts a single IPv4 and clears brute-force transients. **Delete records by IP / CIDR** removes matching rows from the Bot, Visitor, and/or Security logs — useful after cleaning a datacenter range (e.g. hosting-origin noise).
-
-The **Login attempt log** lists **Time**, **Event** (attempt vs lockout badge), **IP**, **Country**, **Username**, and **Unblock** per row. Export CSV for incident records; clear resets the table when you are done investigating.
-
-![Security Log — lockout summary and login attempt table](assets/security-log.png)
-
-## Debug and log triage
-
-The **Debug** tab is the operator console for WordPress diagnostics: three switches sync to `wp-config.php` when writable, plus an in-admin tail viewer for `wp-content/debug.log` with **Refresh** and **Clear log**.
-
-| Switch | Constant | Role |
-|--------|----------|------|
-| **WP Debug** | `WP_DEBUG` | Master debug mode (required before logging works) |
-| **Debug Log File** | `WP_DEBUG_LOG` | Writes PHP notices/errors to `wp-content/debug.log` |
-| **Show Errors on Site** | `WP_DEBUG_DISPLAY` | Keep **OFF** on public sites |
-
-The panel shows **on disk** values read back from `wp-config.php`. When `wp-config.php` is writable, saves apply automatically; otherwise edit constants manually.
-
-**Debug Log** is an in-admin viewer for `wp-content/debug.log` — no FTP required. **Refresh** loads the tail of the file; **Clear log** wipes it after you have captured evidence. File size is shown beside the buttons. When logging is off, the UI prompts you to enable **WP Debug** + **Debug Log File** and save.
-
-On the **Status** tab, the same debug switches appear in the **Site features** grid as **WP Debug**, **Debug Log File**, and **Show Errors on Site** — quick ON/OFF badges without opening the Debug tab.
-
-![Debug tab — WP_DEBUG switches and in-admin log viewer](assets/debug.png)
-
-## Site information panel
-
-The lower **Status** card lists WordPress and PHP versions, memory limit and current usage, active theme and plugin count, database size, SSL state, debug flags as read from disk, cron mode (**visit-trigger disabled** when `DISABLE_WP_CRON` is set — system cron runs `wp-cron.php`), LE auto-update policy, timezone, log row counts with **unlimited retention**, last bot/visitor timestamps, failed logins today, active lockouts, Telegram throttle usage, your current IP (for whitelist copy-paste), and LE schema version.
-
-## Sibling products
-
-| Product | Relationship |
-|---------|----------------|
-| [logicencoder-sitemap-manager-plugin](https://github.com/logicencoder/logicencoder-sitemap-manager-plugin-overview) | XML sitemaps and index — complementary |
-| [logicencoder-login-system-plugin](https://github.com/logicencoder/logicencoder-login-system-plugin-overview) | Branded login and member flows |
-| [logic-encoder-theme](https://github.com/logicencoder/logic-encoder-theme-overview) | Public layout and Customizer SEO strings |
-| [le-shop-plugin](https://github.com/logicencoder/le-shop-plugin-overview) | Telegram Mini App catalogue — separate product |
-| [wp-visitor-stats-plugin](https://github.com/logicencoder/wp-visitor-stats-plugin-overview) | Deep visitor analytics — separate product |
+---
 
 Private code: [le-settings-plugin](https://github.com/logicencoder/le-settings-plugin)
 
-See [REPOS.md](REPOS.md).
+See [REPOS.md](REPOS.md) for related repositories.
 
----
-
-## Operator workflows
-
-#### Logic Encoder admin home
-1. You open **Logic Encoder** in wp-admin and read live counters for bots logged, visitors logged, and failed logins before opening any tab.
-2. You switch among nine tabs from one menu when you need Telegram, protection, logs, or debug in a single session.
-
-#### Telegram incident alerts
-1. You enter bot token and chat ID, enable the channels you care about, and click **Test message** to confirm delivery.
-2. You enable **Alert Throttling** and watch the hourly counter so a brute-force storm does not exhaust your bot quota.
-
-#### Login and site protection
-1. You turn on progressive brute-force lockout and whitelist office CIDR lines so your team never locks itself out during testing.
-2. You flip **Maintenance mode** and anonymous visitors receive your custom **503** while you keep wp-admin access for fixes.
-
-#### SEO and bot classification
-1. You write the homepage meta description and use the character counter to stay in the recommended band for search snippets.
-2. You edit the crawler User-Agent list so known bots route to the Bot Log instead of visitor analytics.
-
-#### Redirect manager
-1. You add a **301** row when you retire an old path without editing `.htaccess` by hand.
-2. You create a **410 Gone** rule when a removed tool URL should stop returning soft 404s.
-
-#### Bot Log forensics
-1. You scan the top-crawler bar chart and paginated table to see which bots hit which URLs overnight.
-2. You export **CSV** or click **Show IP/URL** when you need unmasked endpoints for a security ticket.
-
-#### Visitor Log analytics
-1. You review **Top countries** and the human-traffic table when you spot probe paths on login URLs.
-2. You export visitor rows to **CSV** for a lightweight traffic review without the full wp-visitor-stats stack.
-
-#### Security Log and IP hygiene
-1. You read failed-login stat cards, then **Unblock** a single IP after a false positive.
-2. You delete log rows by **IP or CIDR** across Bot, Visitor, and Security logs after cleaning datacenter noise.
-
-#### Debug and Status consoles
-1. You enable **WP Debug** and **Debug Log File** from the **Debug** tab and tail `debug.log` in wp-admin without FTP.
-2. You open **Status** and scan ON/OFF badges for every protection toggle before a deploy sign-off.
-
-#### Theme integration (operator)
-1. You save settings once and the Logic Encoder theme reads homepage meta and redirect JSON through `le_get_settings()`.
-2. You confirm cron mode on **Status** shows system cron when `DISABLE_WP_CRON` is set so scheduled tasks still run.
-
-
----
-
-**Made by [Logic Encoder](https://logicencoder.com)** · [GitHub](https://github.com/logicencoder) · [Contact](https://logicencoder.com/contact/)
+**[Logic Encoder](https://logicencoder.com)** · [GitHub](https://github.com/logicencoder) · [Contact](https://logicencoder.com/contact/)
