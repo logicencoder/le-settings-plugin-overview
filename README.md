@@ -25,7 +25,7 @@ Telegram notifications provide a way to receive selected site events away from t
 
 ## Maintain protection and access preferences
 
-Protection and login-related controls cover supported hardening choices. Security logs and IP-management tools assist with investigation and routine maintenance. The public value is operational visibility and configurable protection, not a disclosure of the site's internal defensive mechanisms.
+Protection and login-related controls cover supported hardening choices. Security logs and IP-management tools assist with investigation and routine maintenance. The shared view helps the owner keep protection choices and recent events connected.
 
 ![LE Settings — Maintain protection and access preferences](assets/protection.png)
 
